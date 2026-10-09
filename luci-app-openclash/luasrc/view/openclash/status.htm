@@ -2882,8 +2882,12 @@
         select: document.getElementById('active-proxy-select'),
         auto: document.getElementById('active-proxy-auto'),
         update: function(route) {
+            var previous = this.route;
             this.route = route || {};
             var data = this.route;
+            if (previous.name && (previous.name !== data.name || previous.selected !== data.selected)) {
+                window.dispatchEvent(new Event('openclash-route-changed'));
+            }
             var labels = {stopped: '<%:Not Running%>', unavailable: '<%:Not Available%>',
                 direct: '<%:Direct connection%>', blocked: '<%:Connection blocked%>', balanced: '<%:Load balancing%>'};
             document.getElementById('active-proxy-name').textContent =
@@ -2925,7 +2929,8 @@
             }).then(function(result) {
                 if (!result.success) throw new Error('Selection failed');
                 self.dirty = false; self.update(result.active_proxy);
-                message.textContent = '<%:Server selection applied%>';
+                window.dispatchEvent(new Event('openclash-route-changed'));
+                message.textContent = result.connections_reset === false ? '<%:Server selected; some existing connections could not be reset.%>' : '<%:Server selection applied%>';
             }).catch(function() {
                 self.dirty = false;
                 message.textContent = '<%:Unable to switch server. Refresh and try again.%>';

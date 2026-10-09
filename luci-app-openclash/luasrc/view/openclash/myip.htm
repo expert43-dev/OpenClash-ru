@@ -193,6 +193,23 @@
     var refresh_ip;
     var ipCheckXHR = null;
     var httpCheckXHR = null;
+    var routeRefreshTimer = null;
+    window.addEventListener('openclash-route-changed', function() {
+        if (routeRefreshTimer) clearTimeout(routeRefreshTimer);
+        if (ipCheckXHR) { try { ipCheckXHR.abort(); } catch(e) {} ipCheckXHR = null; }
+        ip_mailru_ip = ip_ipsb_ip = ip_ipgeo_ip = ip_ipify_ip = null;
+        ['ip-mailru', 'ip-ipsb', 'ip-ipgeo', 'ip-ipify'].forEach(function(id) {
+            $$.getElementById(id).textContent = localStorage.getItem('privacy_my_ip') === 'true' ? '***.***.***.***' : '<%:Querying...%>';
+            $$.getElementById(id + '-geo').textContent = '';
+        });
+        routeRefreshTimer = setTimeout(function() {
+            routeRefreshTimer = null;
+            if (localStorage.getItem('privacy_my_ip') !== 'true') {
+                (use_router_mode ? get_router_ip_info : myip_Load)();
+            }
+            startIpInterval();
+        }, 350);
+    });
     $$.getElementById('ip-mailru').innerHTML = '<%:Querying...%>';
     $$.getElementById('ip-ipify').innerHTML = '<%:Querying...%>';
     $$.getElementById('ip-ipgeo').innerHTML = '<%:Querying...%>';

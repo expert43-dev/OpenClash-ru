@@ -1554,7 +1554,22 @@ function action_select_active_proxy()
 		HTTP.write_json({ success = false })
 		return
 	end
-	HTTP.write_json({ success = true, active_proxy = active_proxy_status(status, mode) })
+	local sessions = active_proxy_request(status, "/connections")
+	local reset = sessions ~= nil
+	if sessions then
+		local ids = require("luci.openclash_active_proxy").connection_ids(sessions.connections, route.group)
+		if #ids > 0 then
+			local base = "http://127.0.0.1:" .. tostring(tonumber(status.cn_port) or 9090) .. "/connections/"
+			local cmd = "curl -fsS --parallel --parallel-max 8 --connect-timeout 1 -m 2 -X DELETE -H " ..
+				UTIL.shellquote("Authorization: Bearer " .. (status.dase or ""))
+			for _, id in ipairs(ids) do
+				local safe_id = id:gsub("([^%w%-_%.~])", function(c) return string.format("%%%02X", c:byte()) end)
+				cmd = cmd .. " -o /dev/null " .. UTIL.shellquote(base .. safe_id)
+			end
+			reset = SYS.call(cmd .. " >/dev/null 2>&1") == 0
+		end
+	end
+	HTTP.write_json({ success = true, connections_reset = reset, active_proxy = active_proxy_status(status, mode) })
 end
 
 function action_status()

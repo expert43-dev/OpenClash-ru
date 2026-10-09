@@ -29,3 +29,13 @@ assert(r.state == "balanced" and not r.can_select)
 assert(route.resolve(nil, nil, "rule").state == "unavailable")
 assert(route.resolve(p, {{type="Match", proxy="Main", extra={disabled=true}}}, "rule").state == "unavailable")
 print("Active VPN route: nested auto/manual selection, direct/global, split routes, cycles and unavailable nodes passed")
+local ids = route.connection_ids({
+    {id="old-tcp", chains={"Node B", "Auto", "Main", "Video"}},
+    {id="old-quic", chains={"Node A", "Main"}},
+    {id="tv-stream", chains={"DIRECT"}},
+    {id="other-group", chains={"Node B", "Video"}},
+    {id="old-tcp", chains={"Main"}}, {}, {chains={"Main"}}
+}, "Main")
+assert(#ids == 2 and ids[1] == "old-tcp" and ids[2] == "old-quic")
+assert(#route.connection_ids(nil, "Main") == 0)
+print("Server switching: reset nested TCP/QUIC sessions once, preserve direct TV and independent groups")

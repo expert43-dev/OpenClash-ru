@@ -45,7 +45,7 @@ msgid "Switching server..."
 msgstr "Переключение сервера…"
 
 msgid "Server selection applied"
-msgstr "Выбор применён к новым соединениям"
+msgstr "Сервер выбран; прежние VPN-соединения переподключаются"
 
 msgid "Unable to switch server. Refresh and try again."
 msgstr "Не удалось переключить сервер. Обновите страницу и повторите."
@@ -6207,3 +6207,6 @@ msgid ""
 msgstr ""
 "Не удалось добавить локальные профили WireGuard. Проверьте настройки узлов и"
 " группы прокси."
+
+msgid "Server selected; some existing connections could not be reset."
+msgstr "Сервер выбран; часть прежних соединений не удалось закрыть."

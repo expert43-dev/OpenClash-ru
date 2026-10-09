@@ -70,4 +70,22 @@ function M.allowed(route, name)
     return false
 end
 
+-- Existing TCP/QUIC sessions retain their original outbound after selection.
+-- Reset only sessions that actually used this group; DIRECT/LAN stays intact.
+function M.connection_ids(connections, group)
+    local ids, seen = {}, {}
+    for _, connection in ipairs(connections or {}) do
+        if type(connection.id) == "string" and not seen[connection.id] then
+            for _, name in ipairs(connection.chains or {}) do
+                if name == group then
+                    ids[#ids + 1] = connection.id
+                    seen[connection.id] = true
+                    break
+                end
+            end
+        end
+    end
+    return ids
+end
+
 return M
