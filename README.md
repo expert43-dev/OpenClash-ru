@@ -3,7 +3,7 @@
 Форк [vernesong/OpenClash](https://github.com/vernesong/OpenClash), основа — v0.47.156.
 Автор исходного проекта: vernesong и участники OpenClash. Лицензия MIT сохранена.
 
-Русская редакция 0.47.156.1 для OpenWrt с пакетным менеджером APK (25.12).
+Русская редакция 0.47.156.2 для OpenWrt с пакетным менеджером APK (25.12).
 Переведён интерфейс LuCI: обзор, настройки, подписки, серверы, группы, сообщения
 плагина. Названия протоколов, параметры конфигурации и бренды сохранены.
 Перевод начат машинным способом; основные названия и действия выправлены вручную.
@@ -52,7 +52,7 @@ docker run --rm -v "$PWD:/src" openclash-ru-builder python3 tools/build_apk.py
 Установка на OpenWrt 25.12 с APK:
 
 ```sh
-apk add --allow-untrusted /tmp/luci-app-openclash-0.47.156.1.apk
+apk add --allow-untrusted /tmp/luci-app-openclash-0.47.156.2.apk
 ```
 
 После установки обновите страницу браузера без кеша. Пакет не подписан ключами

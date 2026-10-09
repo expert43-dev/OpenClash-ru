@@ -1227,8 +1227,8 @@ function o.cfgvalue(self, section)
 	if self.map:get(section, "other_parameters") == nil then
 		return "# Example:\n"..
 		"# Only support YAML, four spaces need to be reserved at the beginning of each line to maintain formatting alignment\n"..
-		"# 示例：\n"..
-		"# 仅支持 YAML, 每行行首需要多保留四个空格以使脚本处理后能够与上方配置保持格式对齐\n"..
+		translate("# Example:\n")..
+		translate("# Only YAML is supported. Add four spaces at the beginning of each line to align it with the configuration above.\n")..
 		"#    type: ss\n"..
 		"#    server: \"127.0.0.1\"\n"..
 		"#    port: 443\n"..

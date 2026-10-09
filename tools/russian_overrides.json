@@ -358,5 +358,7 @@
   "Smart core source": "Исходный код ядра Smart",
   "Checkin...": "Получение бонуса...",
   "Checkin settings saved": "Настройки получения бонуса сохранены",
-  "Backend Version": "Версия сервера"
+  "Backend Version": "Версия сервера",
+  "# Example:\n": "# Пример:\n",
+  "# Only YAML is supported. Add four spaces at the beginning of each line to align it with the configuration above.\n": "# Поддерживается только YAML. Добавьте четыре пробела в начале каждой строки для выравнивания с конфигурацией выше.\n"
 }

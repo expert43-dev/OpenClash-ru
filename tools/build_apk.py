@@ -14,7 +14,7 @@ import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE_VERSION = "0.47.156"
-VERSION = "0.47.156.1"
+VERSION = "0.47.156.2"
 BASE_SHA256 = "1e4f330fc654e0270ac9cfa762af221335567d9b89388219890e8a7745b914ab"
 BASE_URL = f"https://github.com/vernesong/OpenClash/releases/download/v{BASE_VERSION}/luci-app-openclash-{BASE_VERSION}.apk"
 BUILD = ROOT / "build"

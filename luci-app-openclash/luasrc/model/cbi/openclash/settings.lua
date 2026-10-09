@@ -607,7 +607,7 @@ o.default = 0
 o:depends("stream_auto_select", "1")
 
 o = s:taboption("stream_enhance", Value, "stream_auto_select_group_key_netflix", translate("Group Filter"))
-o.placeholder = "Netflix|奈飞"
+o.placeholder = "Netflix|Нетфликс"
 o.description = translate("It Will Be Searched According To The Regex When Auto Search Group Fails")
 o:depends("stream_auto_select_netflix", "1")
 o.rmempty = true
@@ -635,7 +635,7 @@ o.default = 0
 o:depends("stream_auto_select", "1")
 
 o = s:taboption("stream_enhance", Value, "stream_auto_select_group_key_disney", translate("Group Filter"))
-o.placeholder = "Disney|迪士尼"
+o.placeholder = "Disney|Дисней"
 o.description = translate("It Will Be Searched According To The Regex When Auto Search Group Fails")
 o:depends("stream_auto_select_disney", "1")
 o.rmempty = true
@@ -663,7 +663,7 @@ o.default = 0
 o:depends("stream_auto_select", "1")
 
 o = s:taboption("stream_enhance", Value, "stream_auto_select_group_key_ytb", translate("Group Filter"))
-o.placeholder = "YouTube|油管"
+o.placeholder = "YouTube|Ютуб"
 o.description = translate("It Will Be Searched According To The Regex When Auto Search Group Fails")
 o:depends("stream_auto_select_ytb", "1")
 o.rmempty = true

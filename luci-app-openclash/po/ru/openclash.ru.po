@@ -5875,3 +5875,13 @@ msgstr ""
 
 msgid "Backup failed!"
 msgstr "Резервное копирование не выполнено!"
+
+msgid "# Example:\n"
+msgstr "# Пример:\n"
+
+msgid ""
+"# Only YAML is supported. Add four spaces at the beginning of each line to "
+"align it with the configuration above.\n"
+msgstr ""
+"# Поддерживается только YAML. Добавьте четыре пробела в начале каждой строки"
+" для выравнивания с конфигурацией выше.\n"
