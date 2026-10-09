@@ -818,6 +818,22 @@ html[data-darkmode="true"] .oc svg {
     overflow-x: auto;
 }
 
+.oc .main-card-with-active-proxy { grid-template-rows: auto var(--row-2-height) var(--row-3-height) var(--row-4-height); }
+.oc .main-card-with-active-proxy .core-status-row { height: auto; }
+.oc .main-card-with-active-proxy .core-status-row .sub-card { height: auto; gap: 10px; }
+.oc .active-proxy-box { display: flex; flex: 0 0 auto; flex-direction: column; gap: 6px; min-width: 0; }
+.oc .active-proxy-label, .oc .active-proxy-chain { font-size: 12px; opacity: .8; }
+.oc #active-proxy-name, .oc .active-proxy-chain { overflow-wrap: anywhere; }
+.oc #active-proxy-name { font-size: 16px; }
+.oc #active-proxy-name[data-state="selected"] { color: var(--success-color); }
+.oc .active-proxy-controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.oc #active-proxy-select { flex: 1 1 180px; min-width: 0; max-width: 100%; margin: 0; }
+.oc .active-proxy-controls .dashboard-btn { flex: 0 0 auto; width: auto; min-width: 70px; min-height: 32px; padding: 6px 12px; }
+.oc .active-proxy-controls button:disabled { opacity: .5; cursor: default; }
+.oc .active-proxy-selected { outline: 2px solid var(--success-color); outline-offset: 1px; }
+.oc #active-proxy-message { font-size: 12px; }
+.oc #active-proxy-message:empty { display: none; }
+
 .oc .core-status-row .sub-card {
     gap: 20px;
 }

@@ -7,7 +7,7 @@
 <html>
 <head>
 <script src="/luci-static/resources/openclash/js/common.js?v=<%=plugin_version%>"></script>
-<link rel="stylesheet" href="/luci-static/resources/openclash/css/oc.css?v=<%=plugin_version%>">
+<link rel="stylesheet" href="/luci-static/resources/openclash/css/oc.css?v=<%=plugin_version%>&active-proxy=3">
 <script src="/luci-static/resources/openclash/js/cm6.min.js?v=<%=plugin_version%>"></script>
 </head>
 <fieldset class="cbi-section">
@@ -24,7 +24,7 @@
                             <div id="announcement-content" class="announcement-content"></div>
                         </div>
                     </div>
-                    <div class="main-card">
+                    <div class="main-card main-card-with-active-proxy">
                         <!-- Row 1: Running Status -->
                         <div class="card-row full-width core-status-row">
                             <div class="sub-card">
@@ -59,6 +59,16 @@
                                             <span class="btn-text"><%:Overwrite Module%></span>
                                         </button>
                                     </div>
+                                </div>
+                                <div class="active-proxy-box" aria-live="polite">
+                                    <span class="active-proxy-label"><%:Main VPN server%></span>
+                                    <strong id="active-proxy-name"><%:Collecting data...%></strong>
+                                    <span id="active-proxy-chain" class="active-proxy-chain" title="<%:Individual websites may use different routing rules%>"></span>
+                                    <div class="active-proxy-controls">
+                                        <select id="active-proxy-select" aria-label="<%:Select VPN server%>" disabled></select>
+                                        <button type="button" id="active-proxy-auto" class="dashboard-btn" disabled><%:Automatic selection%></button>
+                                    </div>
+                                    <span id="active-proxy-message" role="status"></span>
                                 </div>
                                 <div class="card-actions">
                                     <button type="button" class="icon-btn theme-toggle-btn" id="theme-toggle" onclick="toggleThemeMode()">
@@ -2867,9 +2877,69 @@
 
     var pluginToggleUserAction = false;
 
+    var ActiveProxy = {
+        route: {}, busy: false, dirty: false, optionsKey: '',
+        select: document.getElementById('active-proxy-select'),
+        auto: document.getElementById('active-proxy-auto'),
+        update: function(route) {
+            this.route = route || {};
+            var data = this.route;
+            var labels = {stopped: '<%:Not Running%>', unavailable: '<%:Not Available%>',
+                direct: '<%:Direct connection%>', blocked: '<%:Connection blocked%>', balanced: '<%:Load balancing%>'};
+            document.getElementById('active-proxy-name').textContent =
+                data.state === 'selected' ? data.name : (labels[data.state] || '<%:Not Available%>');
+            document.getElementById('active-proxy-name').dataset.state = data.state || 'unavailable';
+            var chain = data.chain || [];
+            var detail = chain.slice(0, -1).join(' → ');
+            if (data.state === 'selected') detail = (data.automatic ? '<%:Automatic selection%>' : '<%:Manual selection%>') + (detail ? ' · ' + detail : '');
+            document.getElementById('active-proxy-chain').textContent = detail;
+            var choices = data.choices || [];
+            var key = JSON.stringify([data.group, choices]);
+            if (key !== this.optionsKey) {
+                this.select.textContent = '';
+                choices.forEach(function(name) {
+                    var option = document.createElement('option');
+                    option.value = name; option.textContent = name;
+                    ActiveProxy.select.appendChild(option);
+                });
+                this.optionsKey = key; this.dirty = false;
+            }
+            if (!this.dirty) this.select.value = data.selected || '';
+            this.select.disabled = this.busy || !data.can_select;
+            this.auto.disabled = this.busy || !data.can_select || !data.automatic_name;
+            this.auto.classList.toggle('active-proxy-selected', !!data.automatic);
+        },
+        choose: function(name) {
+            if (this.busy || !this.route.can_select || !name) return;
+            var self = this;
+            this.busy = true; this.update(this.route);
+            var message = document.getElementById('active-proxy-message');
+            message.textContent = '<%:Switching server...%>';
+            fetch('<%=luci.dispatcher.build_url("admin", "services", "openclash", "select_active_proxy")%>', {
+                method: 'POST', credentials: 'same-origin',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: new URLSearchParams({token: '<%=luci.dispatcher.context.authtoken%>', group: this.route.group, name: name}).toString()
+            }).then(function(response) {
+                if (!response.ok) throw new Error('Selection failed');
+                return response.json();
+            }).then(function(result) {
+                if (!result.success) throw new Error('Selection failed');
+                self.dirty = false; self.update(result.active_proxy);
+                message.textContent = '<%:Server selection applied%>';
+            }).catch(function() {
+                self.dirty = false;
+                message.textContent = '<%:Unable to switch server. Refresh and try again.%>';
+            }).finally(function() { self.busy = false; self.update(self.route); });
+        }
+    };
+    ActiveProxy.select.addEventListener('change', function() { ActiveProxy.dirty = true; ActiveProxy.choose(ActiveProxy.select.value); });
+    ActiveProxy.auto.addEventListener('click', function() { ActiveProxy.choose(ActiveProxy.route.automatic_name); });
+
     XHR.poll(5, '<%=luci.dispatcher.build_url("admin", "services", "openclash", "status")%>', null, function(x, status) {
         if (x && x.status == 200) {
             var updates = [];
+
+            if (!ActiveProxy.busy) ActiveProxy.update(status.active_proxy);
 
             if (!pluginToggleUserAction) {
                 updates.push({

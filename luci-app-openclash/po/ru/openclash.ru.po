@@ -14,6 +14,42 @@ msgstr ""
 msgid "OpenClash"
 msgstr "OpenClash"
 
+msgid "Main VPN server"
+msgstr "Основной сервер VPN"
+
+msgid "Individual websites may use different routing rules"
+msgstr "Отдельные сайты могут использовать другие правила маршрутизации"
+
+msgid "Select VPN server"
+msgstr "Выберите сервер VPN"
+
+msgid "Select manually"
+msgstr "Выбрать вручную"
+
+msgid "Automatic selection"
+msgstr "Авто"
+
+msgid "Manual selection"
+msgstr "Вручную"
+
+msgid "Direct connection"
+msgstr "Прямое подключение"
+
+msgid "Connection blocked"
+msgstr "Подключение заблокировано"
+
+msgid "Load balancing"
+msgstr "Балансировка нагрузки"
+
+msgid "Switching server..."
+msgstr "Переключение сервера…"
+
+msgid "Server selection applied"
+msgstr "Выбор применён к новым соединениям"
+
+msgid "Unable to switch server. Refresh and try again."
+msgstr "Не удалось переключить сервер. Обновите страницу и повторите."
+
 msgid "A Mihomo(Clash) Client For OpenWrt"
 msgstr "Клиент Mihomo (Clash) для OpenWrt"
 

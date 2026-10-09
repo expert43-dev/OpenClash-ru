@@ -65,6 +65,8 @@ with tempfile.TemporaryDirectory() as temp:
                 javascript_count += 1
 subprocess.run(["lua5.1", str(ROOT / "tools/test_ip_parsers.lua")], cwd=ROOT, check=True)
 subprocess.run(["lua5.1", str(ROOT / "tools/test_update_routing.lua")], cwd=ROOT, check=True)
+subprocess.run(["lua5.1", str(ROOT / "tools/test_active_proxy.lua")], cwd=ROOT, check=True)
+subprocess.run(["lua5.1", str(ROOT / "tools/test_core_version.lua")], cwd=ROOT, check=True)
 subprocess.run(["lua5.1", str(ROOT / "tools/test_awg.lua")], cwd=ROOT, check=True)
 subprocess.run(["ruby", str(ROOT / "tools/test_awg.rb")], cwd=ROOT, check=True)
 for name in ("awg.sh", "yml_proxys_get.sh", "yml_proxys_set.sh"):

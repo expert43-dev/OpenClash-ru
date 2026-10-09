@@ -13,6 +13,7 @@ function index()
 	entry({"admin", "services", "openclash", "client"},form("openclash/client"),_("Overviews"), 20).leaf = true
 	entry({"admin", "services", "openclash", "conn_status"},call("action_conn_status")).leaf=true
 	entry({"admin", "services", "openclash", "status"},call("action_status")).leaf=true
+	entry({"admin", "services", "openclash", "select_active_proxy"},post("action_select_active_proxy")).leaf=true
 	entry({"admin", "services", "openclash", "startlog"},call("action_start")).leaf=true
 	entry({"admin", "services", "openclash", "refresh_log"},call("action_refresh_log"))
 	entry({"admin", "services", "openclash", "del_log"},call("action_del_log"))
@@ -261,16 +262,24 @@ end
 local ov = dofile("/usr/share/openclash/openclash_version.lua")
 
 local function coremetacv()
-	local v = "0"
-	if not fs.access(meta_core_path) then
-		return v
-	else
-		v = SYS.exec(string.format("%s -v 2>/dev/null |awk -F ' ' '{print $3}' |head -1 |tr -d '\n'", meta_core_path))
-		if not v or v == "" then
-			return "0"
+	-- A UPX-packed core allocates substantial RAM even for -v. The overview
+	-- polls this endpoint every five seconds, so never launch another core here.
+	local stat = require("nixio.fs").stat(meta_core_path)
+	if not stat then return "0" end
+	local cache_path = "/tmp/openclash_core_version_cache.json"
+	local cache = json.parse(fs.readfile(cache_path) or "") or {}
+	local fingerprint = meta_core_path .. ":" .. tostring(stat.ino) .. ":" .. tostring(stat.size) .. ":" .. tostring(stat.mtime)
+	if is_running() then
+		local url = "http://127.0.0.1:" .. tostring(tonumber(cn_port()) or 9090) .. "/version"
+		local info = json.parse(SYS.exec("curl -fsS --connect-timeout 1 -m 2 -H " ..
+			UTIL.shellquote("Authorization: Bearer " .. (dase() or "")) .. " " .. UTIL.shellquote(url) .. " 2>/dev/null"))
+		if info and type(info.version) == "string" and info.version:match("^[%w%._%+%-]+$") then
+			fs.writefile(cache_path, json.stringify({fingerprint = fingerprint, version = info.version}))
+			return info.version
 		end
 	end
-	return v
+	-- Preserve the last known version while stopped, unless the binary changed.
+	return cache.fingerprint == fingerprint and cache.version or "0"
 end
 
 function release_branch()
@@ -1504,6 +1513,50 @@ function action_conn_status(internal)
 	HTTP.write_json(data)
 end
 
+local function active_proxy_request(status, endpoint, payload)
+	if not status.cn_port then return nil end
+	local url = "http://127.0.0.1:" .. tostring(tonumber(status.cn_port) or 9090) .. endpoint
+	local cmd = "curl -fsS --connect-timeout 1 -m 2 -H " .. UTIL.shellquote("Authorization: Bearer " .. (status.dase or ""))
+	if payload then
+		cmd = cmd .. " -X PUT -H 'Content-Type: application/json' --data-binary " .. UTIL.shellquote(json.stringify(payload))
+	end
+	local output = SYS.exec(cmd .. " " .. UTIL.shellquote(url) .. " 2>/dev/null; printf '\\n%u' $?")
+	local body, code = output:match("^(.*)\n(%d+)$")
+	if code ~= "0" then return nil end
+	return body == "" and {} or json.parse(body)
+end
+
+local function active_proxy_status(status, mode)
+	if not status.clash or not is_running() then return { state = "stopped" } end
+	if mode == "direct" then return { state = "direct", name = "DIRECT" } end
+	local data = active_proxy_request(status, "/proxies")
+	local rules = mode ~= "global" and active_proxy_request(status, "/rules") or {}
+	return require("luci.openclash_active_proxy").resolve(data and data.proxies, rules and rules.rules, mode)
+end
+
+function action_select_active_proxy()
+	-- Dispatcher post() checks both POST and the LuCI session CSRF token.
+	local status = action_conn_status(true)
+	local mode = action_rule_mode(true).mode
+	local route = active_proxy_status(status, mode)
+	local name = HTTP.formvalue("name")
+	if HTTP.formvalue("group") ~= route.group or not require("luci.openclash_active_proxy").allowed(route, name) then
+		HTTP.status(409, "Route changed or selection not allowed")
+		HTTP.prepare_content("application/json")
+		HTTP.write_json({ success = false })
+		return
+	end
+	local encoded = route.group:gsub("([^%w%-_%.~])", function(c) return string.format("%%%02X", c:byte()) end)
+	local changed = active_proxy_request(status, "/proxies/" .. encoded, { name = name })
+	HTTP.prepare_content("application/json")
+	if not changed then
+		HTTP.status(502, "Core selection failed")
+		HTTP.write_json({ success = false })
+		return
+	end
+	HTTP.write_json({ success = true, active_proxy = active_proxy_status(status, mode) })
+end
+
 function action_status()
 	local status_data = action_conn_status(true)
 	local rule_data = action_rule_mode(true)
@@ -1537,6 +1590,7 @@ function action_status()
 		mixed_port = proxy_data.mixed_port,
 		auth_user = proxy_data.auth_user,
 		auth_pass = proxy_data.auth_pass,
+		active_proxy = active_proxy_status(status_data, rule_data.mode),
 	}
 
 	HTTP.prepare_content("application/json")
