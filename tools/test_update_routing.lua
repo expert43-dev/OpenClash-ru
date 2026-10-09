@@ -18,3 +18,12 @@ for _, mod in ipairs({"0", "https://cdn.jsdelivr.net/", "https://fastly.jsdelivr
     end
 end
 print("Plugin update/history routes use fork; core routes use upstream")
+
+local file = assert(io.open("luci-app-openclash/luasrc/controller/openclash.lua"))
+local source = file:read("*a")
+file:close()
+local definition = assert(source:match("(local function access_check_curl_flags%b().-\nend)"))
+local flags = assert(loadstring(definition .. "\nreturn access_check_curl_flags"))()
+assert(flags("vk.ru") == "-s" and flags("vk.com") == "-s")
+assert(flags("github.com") == "-sI" and flags("ya.ru") == "-sI")
+print("VK accessibility checks use GET; other probes keep HEAD")

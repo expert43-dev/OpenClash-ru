@@ -2611,6 +2611,11 @@ function action_myip_check()
 	write_padded(json.stringify({ complete = true }))
 end
 
+local function access_check_curl_flags(domain)
+    -- VK rejects HEAD with HTTP 418 but serves ordinary GET requests.
+    return (domain == "vk.ru" or domain == "vk.com") and "-s" or "-sI"
+end
+
 function latency_test(addr, on_result)
 	local result = { success = false, response_time = 0, error = "" }
 
@@ -2632,8 +2637,8 @@ function latency_test(addr, on_result)
 		local fdi, fdo = nixio.pipe()
 		if fdi and fdo then
 			local cmd = string.format(
-				'curl -sI -m 10 --connect-timeout 3 -w "%%{http_code},%%{time_total},%%{time_connect},%%{time_appconnect}" "%s" -o /dev/null 2>/dev/null',
-				test_url
+				'curl %s -m 10 --connect-timeout 3 -w "%%{http_code},%%{time_total},%%{time_connect},%%{time_appconnect}" "%s" -o /dev/null 2>/dev/null',
+				access_check_curl_flags(addr), test_url
 			)
 			local pid = nixio.fork()
 			if pid > 0 then
@@ -2853,8 +2858,8 @@ function action_website_check()
 			local fdi, fdo = nixio.pipe()
 			if fdi and fdo then
 				local cmd = string.format(
-					'curl -sI -m 10 --connect-timeout 3 -w "%%{http_code},%%{time_total},%%{time_connect},%%{time_appconnect}" "%s" -o /dev/null 2>/dev/null',
-					test_url
+					'curl %s -m 10 --connect-timeout 3 -w "%%{http_code},%%{time_total},%%{time_connect},%%{time_appconnect}" "%s" -o /dev/null 2>/dev/null',
+					access_check_curl_flags(d), test_url
 				)
 				local pid = nixio.fork()
 				if pid > 0 then
