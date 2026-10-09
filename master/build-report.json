@@ -1,9 +1,9 @@
 {
-  "version": "0.47.156.6",
+  "version": "0.47.156.7",
   "upstream_version": "0.47.156",
   "upstream_sha256": "1e4f330fc654e0270ac9cfa762af221335567d9b89388219890e8a7745b914ab",
-  "apk_sha256": "d462a2d70d8da62c6c8dbc9e049026ece0ddac9a33138d941549b67ddc3d83eb",
-  "size": 12700632,
+  "apk_sha256": "c39ea87e6173f0b2361d092735312b460e35e6ca6f7722283df1b9c010144906",
+  "size": 12700849,
   "dependencies_preserved": true,
   "lifecycle_scripts_preserved": true,
   "payload_roundtrip_verified": true
