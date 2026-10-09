@@ -52,8 +52,11 @@ LOG_OUT "Deleting Old Configuration..."
 del_options()
 {
    local section="$1"
-   local config
+   local config awg_local
    config_get "config" "$section" "config" ""
+   config_get "awg_local" "$section" "awg_local" "0"
+
+   [ "$awg_local" = "1" ] && return
 
    if [ "$config" = "$CONFIG_NAME" ]; then
       uci -q delete openclash."$section"

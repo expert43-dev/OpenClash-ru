@@ -67,12 +67,17 @@ subprocess.run(["lua5.1", str(ROOT / "tools/test_ip_parsers.lua")], cwd=ROOT, ch
 subprocess.run(["lua5.1", str(ROOT / "tools/test_update_routing.lua")], cwd=ROOT, check=True)
 subprocess.run(["lua5.1", str(ROOT / "tools/test_active_proxy.lua")], cwd=ROOT, check=True)
 subprocess.run(["lua5.1", str(ROOT / "tools/test_core_version.lua")], cwd=ROOT, check=True)
+subprocess.run(["node", "--check", str(PACKAGE / "root/www/luci-static/resources/openclash/js/awg-import.js")], check=True)
+subprocess.run(["node", str(ROOT / "tools/test_awg_import.js")], cwd=ROOT, check=True)
+subprocess.run(["ruby", str(ROOT / "tools/test_awg_local.rb")], cwd=ROOT, check=True)
 subprocess.run(["lua5.1", str(ROOT / "tools/test_awg.lua")], cwd=ROOT, check=True)
 subprocess.run(["ruby", str(ROOT / "tools/test_awg.rb")], cwd=ROOT, check=True)
 for name in ("awg.sh", "yml_proxys_get.sh", "yml_proxys_set.sh"):
     subprocess.run(["bash", "-n", str(PACKAGE / "root/usr/share/openclash" / name)], check=True)
 subprocess.run(["ruby", "-c", str(PACKAGE / "root/usr/share/openclash/awg.rb")], check=True)
 subprocess.run(["bash", "-n", str(PACKAGE / "root/usr/share/openclash/openclash_update.sh")], check=True)
+subprocess.run(["bash", "-n", str(PACKAGE / "root/usr/share/openclash/yml_groups_get.sh")], check=True)
+subprocess.run(["bash", "-n", str(PACKAGE / "root/etc/init.d/openclash")], check=True)
 
 # Exercise the same translated template in a browser using mocked LuCI endpoints.
 preview = ROOT / "build/preview"

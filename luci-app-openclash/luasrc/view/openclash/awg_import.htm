@@ -1,0 +1,70 @@
+<script src="/luci-static/resources/openclash/js/awg-import.js?v=1"></script>
+<details id="awg-import-box" style="margin-top:12px">
+    <summary><%:Import AmneziaWG profile%></summary>
+    <p><%:Choose a .conf or .vpn file, or paste a vpn:// profile link. Parsing stays in your browser.%></p>
+    <input id="awg-import-file" type="file" accept=".conf,.vpn,.json,.txt" aria-label="<%:AmneziaWG profile file%>">
+    <textarea id="awg-import-link" rows="3" autocomplete="off" spellcheck="false" placeholder="vpn://" aria-label="<%:AmneziaWG profile link%>" style="display:block;width:100%;margin:8px 0"></textarea>
+    <button id="awg-import-read" type="button" class="btn cbi-button"><%:Read profile link%></button>
+    <select id="awg-import-profiles" hidden style="display:none" aria-label="<%:Choose profile%>"></select>
+    <p id="awg-import-preview" role="status" style="white-space:pre-wrap"></p>
+    <button id="awg-import-fill" type="button" class="btn cbi-button cbi-button-apply" disabled><%:Fill server fields%></button>
+    <input id="awg-import-marker" type="hidden" name="openclash_awg_import_sid" value="">
+</details>
+<script>
+(function() {
+    var sid = '<%=self.value%>', profiles = [], busy = false;
+    var file = document.getElementById('awg-import-file'), link = document.getElementById('awg-import-link');
+    var select = document.getElementById('awg-import-profiles'), preview = document.getElementById('awg-import-preview');
+    var fill = document.getElementById('awg-import-fill'), read = document.getElementById('awg-import-read');
+    var messages = {
+        INVALID: '<%:Invalid AmneziaWG profile. Check the keys, address and endpoint.%>',
+        TOO_LARGE: '<%:Profile is too large. Maximum size is 256 KiB.%>',
+        DUPLICATE_FIELD: '<%:The profile contains duplicate fields.%>',
+        MULTIPLE_PEERS: '<%:Multiple peers are not supported by this importer. Export a profile with one peer.%>',
+        MULTIPLE_ADDRESSES: '<%:Use a profile with at most one IPv4 and one IPv6 address.%>',
+        UNSUPPORTED_FIELD: '<%:The profile contains unsupported fields or scripts. Export the original AmneziaWG format.%>',
+        VERSION: '<%:The AWG version conflicts with the profile parameters or is unsupported.%>',
+        CONFLICT: '<%:Amnezia JSON and INI parameters conflict. Export a fresh profile.%>',
+        SUBSCRIPTION: '<%:This is an Amnezia subscription key. Export an original AmneziaWG .conf profile first.%>',
+        NO_PROFILE: '<%:No ready WireGuard or AmneziaWG client profile was found in this link.%>',
+        BROWSER: '<%:This browser cannot unpack vpn:// links. Update the browser or import a .conf file.%>'
+    };
+    function reset() { profiles = []; select.textContent = ''; select.hidden = true; select.style.display = 'none'; fill.disabled = true; preview.textContent = ''; }
+    function show() {
+        var p = profiles[Number(select.value) || 0];
+        if (!p) return;
+        preview.textContent = p.name + '\n' + p.endpoint + '\n' + (p.fields.awg_enable === '1' ? 'AmneziaWG ' +
+            (p.fields.awg_version === '3' ? '3.0 / 3.1' : '1.x / 2.0') : 'WireGuard') +
+            (p.warning ? '\n<%:Version is not specified. Check the AWG version against the server before saving.%>' : '') +
+            '\n<%:Select the configuration and proxy group, then save and apply the server settings.%>';
+        fill.disabled = false;
+    }
+    async function load(text, name) {
+        if (busy) return;
+        reset(); busy = true; read.disabled = true; file.disabled = true; link.disabled = true;
+        try {
+            profiles = await OpenClashAWGImport.parse(text, name);
+            profiles.forEach(function(p, index) { var option = document.createElement('option'); option.value = index; option.textContent = p.name + ' · ' + p.endpoint; select.appendChild(option); });
+            select.hidden = profiles.length < 2; select.style.display = profiles.length < 2 ? 'none' : 'inline-block'; show();
+        } catch (error) { preview.textContent = messages[error.message] || messages.INVALID; }
+        finally { busy = false; read.disabled = false; file.disabled = false; link.disabled = false; }
+    }
+    link.addEventListener('input', reset);
+    read.addEventListener('click', function() { if (!/^vpn:\/\//i.test(link.value.trim())) { reset(); preview.textContent = messages.INVALID; return; } load(link.value, ''); });
+    file.addEventListener('change', async function() {
+        reset(); var chosen = file.files[0]; if (!chosen) return;
+        if (chosen.size > OpenClashAWGImport.limit) { preview.textContent = messages.TOO_LARGE; file.value = ''; return; }
+        try { await load(await chosen.text(), chosen.name.replace(/\.(conf|vpn|json|txt)$/i, '')); }
+        catch (_) { preview.textContent = messages.INVALID; }
+        file.value = '';
+    });
+    select.addEventListener('change', show);
+    fill.addEventListener('click', function() {
+        var p = profiles[Number(select.value) || 0]; if (!p || busy) return;
+        Object.keys(p.fields).forEach(function(field) { setFormValue(sid, field, p.fields[field]); });
+        document.getElementById('awg-import-marker').value = sid;
+        link.value = ''; reset();
+        preview.textContent = '<%:Profile fields filled. Choose the proxy group, save and apply the settings.%>';
+    });
+})();
+</script>

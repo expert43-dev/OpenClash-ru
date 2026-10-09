@@ -3684,7 +3684,11 @@
         function updateCoreDot(corelv) {
             if (DOMCache.core_version_display.classList.contains('oc-hidden')) return;
             var coremetacv = DOMCache.core_version_text.textContent;
-            var hasUpdate = corelv && corelv !== "" && corelv !== "loading..." && corelv !== coremetacv;
+            // The upstream master feed can advertise alpha builds. A stable
+            // installed core should only be offered another stable release.
+            var stableCore = /^v?\d+\.\d+\.\d+$/.test(coremetacv);
+            var stableCandidate = /^v?\d+\.\d+\.\d+$/.test(corelv || '');
+            var hasUpdate = corelv && corelv !== "" && corelv !== "loading..." && corelv !== coremetacv && (!stableCore || stableCandidate);
             var existingDot = DOMCache.core_version_display.querySelector('.update-dot');
             if (hasUpdate) {
                 if (!existingDot) {

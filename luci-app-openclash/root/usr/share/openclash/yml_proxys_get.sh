@@ -178,6 +178,9 @@ ruby -ryaml -rYAML -rawg -I "/usr/share/openclash" -E UTF-8 -e "
       };
    end;
 
+   local_nodes = YAML.safe_load(IO.popen(['lua', '/usr/share/openclash/awg_local.lua', '$CONFIG_NAME'], &:read), aliases: false) || [];
+   local_names = local_nodes.map { |node| node['name'] };
+   Value['proxies'] = Value['proxies'].reject { |node| local_names.include?(node['name']) };
    Value['proxies'].each_with_index do |x, index|
       uci_name_tmp << %x{uci -q add openclash servers 2>&1}.chomp;
       queue.push(nil)

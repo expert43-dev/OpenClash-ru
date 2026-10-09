@@ -3666,6 +3666,13 @@ start_service()
             fi
          fi
 
+         # Retained WireGuard/AWG nodes survive downloaded subscription replacement.
+         if ! lua /usr/share/openclash/awg_local.lua "$(basename "$RAW_CONFIG_FILE")" | \
+            ruby /usr/share/openclash/awg_local.rb "$TMP_CONFIG_FILE"; then
+            LOG_TIP "Local WireGuard profiles could not be merged; check node settings and proxy groups."
+            return 1
+         fi
+
          #provider path
          ruby -ryaml -rYAML -I "/usr/share/openclash" -E UTF-8 -e "
             begin

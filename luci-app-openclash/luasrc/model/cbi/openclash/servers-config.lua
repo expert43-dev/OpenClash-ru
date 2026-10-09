@@ -111,7 +111,7 @@ s = m:section(NamedSection, sid, "servers")
 s.anonymous = true
 s.addremove = false
 
-o = s:option(DummyValue, "server_url", "SS/SSR/VMESS/TROJAN URL")
+o = s:option(DummyValue, "server_url", translate("Import / export server profile"))
 o.rawhtml = true
 o.template = "openclash/server_url"
 o.value = sid
@@ -410,6 +410,21 @@ o.placeholder = translate("1420")
 o:depends("type", "wireguard")
 
 -- AmneziaWG uses the WireGuard node type in Mihomo.
+o = s:option(Flag, "awg_local", translate("Keep local WireGuard profile"))
+o.default = "0"
+o.rmempty = false
+o:depends("type", "wireguard")
+o.description = translate("Keep this node when reading a configuration and add it to matching proxy groups after subscription updates. Disable or delete the node to stop adding it.")
+
+function m.on_before_commit(self)
+    if HTTP.formvalue("openclash_awg_import_sid") == sid and self.uci:get(openclash, sid, "type") == "wireguard" then
+        -- A new profile replaces hidden YAML snapshots from the previous node.
+        for _, key in ipairs({"awg_options_blob", "wg_extra_blob", "wg_has_peers"}) do
+            self.uci:delete(openclash, sid, key)
+        end
+    end
+end
+
 o = s:option(Flag, "awg_enable", translate("Enable AmneziaWG"))
 o.default = "0"
 o.rmempty = false
@@ -1401,6 +1416,8 @@ o = a:option(Button,"Commit", " ")
 o.inputtitle = translate("Commit Settings")
 o.inputstyle = "apply"
 o.write = function()
+	-- This page commits through its own button rather than the Map action.
+	m:on_before_commit()
 	m.uci:commit(openclash)
 	HTTP.redirect(m.redirect)
 end
