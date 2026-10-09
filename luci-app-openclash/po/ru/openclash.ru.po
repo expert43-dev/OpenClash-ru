@@ -5885,3 +5885,144 @@ msgid ""
 msgstr ""
 "# Поддерживается только YAML. Добавьте четыре пробела в начале каждой строки"
 " для выравнивания с конфигурацией выше.\n"
+
+msgid "Enable AmneziaWG"
+msgstr "Включить AmneziaWG"
+
+msgid "Copy the AmneziaWG parameters from the server configuration. Both ends must use matching settings."
+msgstr "Скопируйте параметры AmneziaWG из конфигурации сервера. Настройки клиента и сервера должны совпадать."
+
+msgid "AmneziaWG version"
+msgstr "Версия AmneziaWG"
+
+msgid "AmneziaWG 1.x / 2.0"
+msgstr "AmneziaWG 1.x / 2.0"
+
+msgid "AmneziaWG 3.0 / 3.1"
+msgstr "AmneziaWG 3.0 / 3.1"
+
+msgid "Mihomo uses version: 3 for both AWG 3.0 and 3.1. AWG 3.1 adds the random-trailers and disable-cookies options. A compatible Mihomo core is required."
+msgstr "Для AWG 3.0 и 3.1 Mihomo использует version: 3. В AWG 3.1 добавлены параметры random-trailers и disable-cookies. Требуется совместимое ядро Mihomo."
+
+msgid "Enter a single line without control characters"
+msgstr "Введите одну строку без управляющих символов"
+
+msgid "Junk packet count (Jc)"
+msgstr "Количество маскирующих пакетов (Jc)"
+
+msgid "Minimum junk packet size (Jmin)"
+msgstr "Минимальный размер маскирующего пакета (Jmin)"
+
+msgid "Maximum junk packet size (Jmax)"
+msgstr "Максимальный размер маскирующего пакета (Jmax)"
+
+msgid "Handshake initiation padding (S1)"
+msgstr "Дополнение пакета начала соединения (S1)"
+
+msgid "Handshake response padding (S2)"
+msgstr "Дополнение пакета ответа сервера (S2)"
+
+msgid "Cookie reply padding (S3)"
+msgstr "Дополнение пакета ответа cookie (S3)"
+
+msgid "Transport packet padding (S4)"
+msgstr "Дополнение пакета данных (S4)"
+
+msgid "Handshake initiation header (H1)"
+msgstr "Заголовок пакета начала соединения (H1)"
+
+msgid "Handshake response header (H2)"
+msgstr "Заголовок пакета ответа сервера (H2)"
+
+msgid "Cookie reply header (H3)"
+msgstr "Заголовок пакета ответа cookie (H3)"
+
+msgid "Transport packet header (H4)"
+msgstr "Заголовок пакета данных (H4)"
+
+msgid "An unsigned 32-bit number or MIN-MAX range. Ranges require AWG 2.0 or later."
+msgstr "Целое число от 0 до 4294967295 или диапазон МИН-МАКС. Диапазоны доступны начиная с AWG 2.0."
+
+msgid "Enter a number or an increasing range from 0 to 4294967295"
+msgstr "Введите число или возрастающий диапазон от 0 до 4294967295"
+
+msgid "Copy the complete packet signature, including its tags, from the server configuration."
+msgstr "Скопируйте сигнатуру пакета целиком, вместе с тегами, из конфигурации сервера."
+
+msgid "Legacy signature interval (Itime)"
+msgstr "Интервал сигнатур старой версии (Itime)"
+
+msgid "AWG 1.5 only. Leave empty for AWG 2.0 and 3.x."
+msgstr "Только для AWG 1.5. Для AWG 2.0 и 3.x оставьте поле пустым."
+
+msgid "Header protection key"
+msgstr "Ключ защиты заголовков"
+
+msgid "Base64-encoded 32-byte key from the AWG 3.x server configuration."
+msgstr "Ключ длиной 32 байта в формате Base64 из конфигурации сервера AWG 3.x."
+
+msgid "Enter a 32-byte Base64 key (44 characters ending in =)"
+msgstr "Введите ключ длиной 32 байта в Base64 (44 символа с = в конце)"
+
+msgid "Additional content padding"
+msgstr "Дополнительное заполнение пакетов данных"
+
+msgid "Number of padding bytes or a MIN-MAX range."
+msgstr "Количество байт заполнения или диапазон МИН-МАКС."
+
+msgid "Enter a number or an increasing range from 0 to 65535"
+msgstr "Введите число или возрастающий диапазон от 0 до 65535"
+
+msgid "Rekey interval (seconds)"
+msgstr "Интервал смены ключей (секунды)"
+
+msgid "Rekey retry timeout (seconds)"
+msgstr "Тайм-аут повторной смены ключей (секунды)"
+
+msgid "Key rejection interval (seconds)"
+msgstr "Срок действия ключей (секунды)"
+
+msgid "Keepalive timeout (seconds)"
+msgstr "Тайм-аут поддержания соединения (секунды)"
+
+msgid "Maximum handshake attempts"
+msgstr "Максимальное число попыток соединения"
+
+msgid "Leave empty to use the Mihomo default. Set only if specified by the server configuration."
+msgstr "Оставьте пустым для значения по умолчанию. Заполняйте только по конфигурации сервера."
+
+msgid "Random packet trailers (AWG 3.1)"
+msgstr "Случайные дополнения в конце пакетов (AWG 3.1)"
+
+msgid "Disable cookies (AWG 3.1)"
+msgstr "Отключить cookie (AWG 3.1)"
+
+msgid "Use core default"
+msgstr "По умолчанию в ядре"
+
+msgid "Match the AWG 3.1 server setting. An explicit disabled value is preserved when exporting YAML."
+msgstr "Значение должно совпадать с настройкой сервера AWG 3.1. Явное отключение сохраняется при экспорте YAML."
+
+msgid "Packet signature I1"
+msgstr "Сигнатура пакета I1"
+
+msgid "Packet signature I2"
+msgstr "Сигнатура пакета I2"
+
+msgid "Packet signature I3"
+msgstr "Сигнатура пакета I3"
+
+msgid "Packet signature I4"
+msgstr "Сигнатура пакета I4"
+
+msgid "Packet signature I5"
+msgstr "Сигнатура пакета I5"
+
+msgid "Legacy packet signature J1"
+msgstr "Сигнатура пакета старой версии J1"
+
+msgid "Legacy packet signature J2"
+msgstr "Сигнатура пакета старой версии J2"
+
+msgid "Legacy packet signature J3"
+msgstr "Сигнатура пакета старой версии J3"

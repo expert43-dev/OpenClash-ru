@@ -1,0 +1,15 @@
+package.path = './luci-app-openclash/luasrc/?.lua;' .. package.path
+local awg = require 'openclash_awg'
+assert(awg.range('0-4294967295', 4294967295))
+assert(awg.range('0', 4294967295))
+assert(awg.range('65535', 65535))
+assert(not awg.range('20-10', 4294967295))
+assert(not awg.range('4294967296', 4294967295))
+assert(not awg.range('-1', 65535))
+assert(not awg.range('0-65536', 65535))
+assert(not awg.range('1\n2', 65535))
+assert(awg.key('MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY='))
+assert(not awg.key('invalid'))
+assert(awg.singleline('<b 0xf6ab><r 10>'))
+assert(not awg.singleline('first\nsecond'))
+print('AWG form validation tests passed')

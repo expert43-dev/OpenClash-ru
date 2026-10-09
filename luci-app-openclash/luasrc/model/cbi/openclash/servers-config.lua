@@ -6,6 +6,7 @@ local fs = require "luci.openclash"
 local sys = require "luci.sys"
 local HTTP = require "luci.http"
 local DISP = require "luci.dispatcher"
+local awg = require "luci.openclash_awg"
 local sid = arg[1]
 local uuid = luci.sys.exec("cat /proc/sys/kernel/random/uuid")
 local file_path = fs.get_file_path_from_request()
@@ -407,6 +408,121 @@ o.rmempty = true
 o.default = "1420"
 o.placeholder = translate("1420")
 o:depends("type", "wireguard")
+
+-- AmneziaWG uses the WireGuard node type in Mihomo.
+o = s:option(Flag, "awg_enable", translate("Enable AmneziaWG"))
+o.default = "0"
+o.rmempty = false
+o:depends("type", "wireguard")
+o.description = translate("Copy the AmneziaWG parameters from the server configuration. Both ends must use matching settings.")
+
+o = s:option(ListValue, "awg_version", translate("AmneziaWG version"))
+o:value("1", "AmneziaWG 1.x")
+o:value("2", translate("AmneziaWG 1.x / 2.0"))
+o:value("3", translate("AmneziaWG 3.0 / 3.1"))
+o.default = "3"
+o.rmempty = false
+o:depends({type = "wireguard", awg_enable = "1"})
+o.description = translate("Mihomo uses version: 3 for both AWG 3.0 and 3.1. AWG 3.1 adds the random-trailers and disable-cookies options. A compatible Mihomo core is required.")
+
+local function awg_value(key, label, description, version)
+    local field = s:option(Value, "awg_" .. key, label)
+    field.rmempty = true
+    field.description = description
+    local dependency = {type = "wireguard", awg_enable = "1"}
+    if version then dependency.awg_version = version end
+    field:depends(dependency)
+    function field.validate(self, value)
+        return awg.singleline(value), translate("Enter a single line without control characters")
+    end
+    return field
+end
+
+local numeric_fields = {
+    {"jc", translate("Junk packet count (Jc)")},
+    {"jmin", translate("Minimum junk packet size (Jmin)")},
+    {"jmax", translate("Maximum junk packet size (Jmax)")},
+    {"s1", translate("Handshake initiation padding (S1)")},
+    {"s2", translate("Handshake response padding (S2)")},
+    {"s3", translate("Cookie reply padding (S3)")},
+    {"s4", translate("Transport packet padding (S4)")}
+}
+for _, field in ipairs(numeric_fields) do
+    o = awg_value(field[1], field[2])
+    o.datatype = "range(0,65535)"
+end
+
+local header_fields = {
+    {"h1", translate("Handshake initiation header (H1)")},
+    {"h2", translate("Handshake response header (H2)")},
+    {"h3", translate("Cookie reply header (H3)")},
+    {"h4", translate("Transport packet header (H4)")}
+}
+for _, field in ipairs(header_fields) do
+    o = awg_value(field[1], field[2], translate("An unsigned 32-bit number or MIN-MAX range. Ranges require AWG 2.0 or later."))
+    function o.validate(self, value)
+        return awg.range(value, 4294967295), translate("Enter a number or an increasing range from 0 to 4294967295")
+    end
+end
+
+local signature_fields = {
+    {"i1", translate("Packet signature I1")},
+    {"i2", translate("Packet signature I2")},
+    {"i3", translate("Packet signature I3")},
+    {"i4", translate("Packet signature I4")},
+    {"i5", translate("Packet signature I5")}
+}
+for _, field in ipairs(signature_fields) do
+    awg_value(field[1], field[2], translate("Copy the complete packet signature, including its tags, from the server configuration."))
+end
+
+local legacy_fields = {
+    {"j1", translate("Legacy packet signature J1")},
+    {"j2", translate("Legacy packet signature J2")},
+    {"j3", translate("Legacy packet signature J3")},
+    {"itime", translate("Legacy signature interval (Itime)")}
+}
+for _, field in ipairs(legacy_fields) do
+    o = awg_value(field[1], field[2], translate("AWG 1.5 only. Leave empty for AWG 2.0 and 3.x."), "2")
+    if field[1] == "itime" then o.datatype = "uinteger" end
+end
+
+o = awg_value("header_protection_key", translate("Header protection key"), translate("Base64-encoded 32-byte key from the AWG 3.x server configuration."), "3")
+o.password = true
+function o.validate(self, value)
+    return awg.key(value), translate("Enter a 32-byte Base64 key (44 characters ending in =)")
+end
+
+o = awg_value("content_padding_addition", translate("Additional content padding"), translate("Number of padding bytes or a MIN-MAX range."), "3")
+function o.validate(self, value)
+    return awg.range(value, 65535), translate("Enter a number or an increasing range from 0 to 65535")
+end
+
+local timer_fields = {
+    {"rekey_after_time", translate("Rekey interval (seconds)")},
+    {"rekey_timeout", translate("Rekey retry timeout (seconds)")},
+    {"reject_after_time", translate("Key rejection interval (seconds)")},
+    {"keepalive_timeout", translate("Keepalive timeout (seconds)")},
+    {"max_handshake_attempts", translate("Maximum handshake attempts")}
+}
+for _, field in ipairs(timer_fields) do
+    o = awg_value(field[1], field[2], translate("Leave empty to use the Mihomo default. Set only if specified by the server configuration."), "3")
+    o.datatype = "uinteger"
+end
+
+local boolean_fields = {
+    {"random_trailers", translate("Random packet trailers (AWG 3.1)")},
+    {"disable_cookies", translate("Disable cookies (AWG 3.1)")}
+}
+for _, field in ipairs(boolean_fields) do
+    o = s:option(ListValue, "awg_" .. field[1], field[2])
+    o:value("", translate("Use core default"))
+    o:value("true", translate("Enabled"))
+    o:value("false", translate("Disabled"))
+    o.rmempty = true
+    o:depends({type = "wireguard", awg_enable = "1", awg_version = "3"})
+    o.description = translate("Match the AWG 3.1 server setting. An explicit disabled value is preserved when exporting YAML.")
+end
 
 o = s:option(Flag, "flag_transport", translate("Enable Transport Protocol Settings"))
 o:depends("type", "hysteria")

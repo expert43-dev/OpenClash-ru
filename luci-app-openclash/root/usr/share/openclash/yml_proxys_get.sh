@@ -47,7 +47,7 @@ if [ ! -s "$CONFIG_FILE" ]; then
 fi
 
 #获取代理集信息
-ruby -ryaml -rYAML -I "/usr/share/openclash" -E UTF-8 -e "
+ruby -ryaml -rYAML -rawg -I "/usr/share/openclash" -E UTF-8 -e "
    begin
       Value = YAML.load_file('$CONFIG_FILE');
    rescue Exception => e
@@ -794,6 +794,7 @@ ruby -ryaml -rYAML -I "/usr/share/openclash" -E UTF-8 -e "
 
             #WireGuard
             if x['type'] == 'wireguard' then
+               uci_commands.concat(OpenClashAWG.import_commands(uci_set, x));
                threads << Thread.new{
                #wg_ip
                if x.key?('ip') then
@@ -824,8 +825,9 @@ ruby -ryaml -rYAML -I "/usr/share/openclash" -E UTF-8 -e "
 
                threads << Thread.new{
                #preshared_key
-               if x.key?('preshared-key') then
-                  uci_commands << uci_set + 'preshared_key=\"' + x['preshared-key'].to_s + '\"'
+               if x.key?('pre-shared-key') or x.key?('preshared-key') then
+                  key = x['pre-shared-key'] || x['preshared-key'];
+                  uci_commands << uci_set + 'preshared_key=' + OpenClashAWG.uci_quote(key.to_s)
                end
                };
 

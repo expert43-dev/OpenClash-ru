@@ -3,6 +3,7 @@
 . /usr/share/openclash/ruby.sh
 . /usr/share/openclash/log.sh
 . /usr/share/openclash/uci.sh
+. /usr/share/openclash/awg.sh
 
 set_lock() {
    exec 886>"/tmp/lock/openclash_proxies_set.lock" 2>/dev/null
@@ -186,6 +187,8 @@ yml_servers_set()
    config_get "name" "$section" "name" ""
    config_get "server" "$section" "server" ""
    config_get "port" "$section" "port" ""
+   local wg_has_peers
+   config_get "wg_has_peers" "$section" "wg_has_peers" "0"
 
    if [ "$enabled" = "0" ]; then
       return
@@ -199,11 +202,11 @@ yml_servers_set()
       return
    fi
 
-   if [ -z "$server" ] && [ "$type" != "direct" ] && [ "$type" != "dns" ]; then
+   if [ -z "$server" ] && [ "$type" != "direct" ] && [ "$type" != "dns" ] && ! { [ "$type" = "wireguard" ] && [ "$wg_has_peers" = "1" ]; }; then
       return
    fi
 
-   if [ -z "$port" ] && [ "$type" != "direct" ] && [ "$type" != "dns" ]; then
+   if [ -z "$port" ] && [ "$type" != "direct" ] && [ "$type" != "dns" ] && ! { [ "$type" = "wireguard" ] && [ "$wg_has_peers" = "1" ]; }; then
       return
    fi
 
@@ -816,6 +819,12 @@ fi
 
 #WireGuard
 if [ "$type" = "wireguard" ]; then
+   local awg_fragment
+   if ! awg_fragment=$(openclash_awg_export "$section" 2>/dev/null); then
+      LOG_ERROR "Invalid AmneziaWG settings; configuration file was not changed"
+      del_lock
+      exit 1
+   fi
    config_get "wg_ip" "$section" "wg_ip" ""
    config_get "wg_ipv6" "$section" "wg_ipv6" ""
    config_get "private_key" "$section" "private_key" ""
@@ -827,9 +836,13 @@ if [ "$type" = "wireguard" ]; then
 cat >> "$SERVER_FILE" <<-EOF
   - name: "$name"
     type: $type
+EOF
+    if [ -n "$server" ] && [ -n "$port" ]; then
+cat >> "$SERVER_FILE" <<-EOF
     server: "$server"
     port: $port
 EOF
+    fi
     if [ -n "$wg_ip" ]; then
 cat >> "$SERVER_FILE" <<-EOF
     ip: "$wg_ip"
@@ -852,7 +865,7 @@ EOF
     fi
     if [ -n "$preshared_key" ]; then
 cat >> "$SERVER_FILE" <<-EOF
-    preshared-key: "$preshared_key"
+    pre-shared-key: "$preshared_key"
 EOF
     fi
     if [ -n "$wg_dns" ]; then
@@ -871,6 +884,7 @@ cat >> "$SERVER_FILE" <<-EOF
     udp: $udp
 EOF
     fi
+    [ -z "$awg_fragment" ] || printf '%s\n' "$awg_fragment" >> "$SERVER_FILE"
 fi
 
 #hysteria

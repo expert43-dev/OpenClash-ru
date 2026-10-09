@@ -65,12 +65,17 @@ with tempfile.TemporaryDirectory() as temp:
                 javascript_count += 1
 subprocess.run(["lua5.1", str(ROOT / "tools/test_ip_parsers.lua")], cwd=ROOT, check=True)
 subprocess.run(["lua5.1", str(ROOT / "tools/test_update_routing.lua")], cwd=ROOT, check=True)
+subprocess.run(["lua5.1", str(ROOT / "tools/test_awg.lua")], cwd=ROOT, check=True)
+subprocess.run(["ruby", str(ROOT / "tools/test_awg.rb")], cwd=ROOT, check=True)
+for name in ("awg.sh", "yml_proxys_get.sh", "yml_proxys_set.sh"):
+    subprocess.run(["bash", "-n", str(PACKAGE / "root/usr/share/openclash" / name)], check=True)
+subprocess.run(["ruby", "-c", str(PACKAGE / "root/usr/share/openclash/awg.rb")], check=True)
 subprocess.run(["bash", "-n", str(PACKAGE / "root/usr/share/openclash/openclash_update.sh")], check=True)
 
 # Exercise the same translated template in a browser using mocked LuCI endpoints.
 preview = ROOT / "build/preview"
 preview.mkdir(parents=True, exist_ok=True)
 (preview / "myip.html").write_text(rendered, encoding="utf-8")
-report = {"catalog_entries": len(po), "source_messages_covered": len(keys), "lua_files_checked": lua_count, "javascript_blocks_checked": javascript_count, "update_routes_checked": True, "overview_javascript_checked": True, "ip_parser_tests_passed": True}
+report = {"catalog_entries": len(po), "source_messages_covered": len(keys), "lua_files_checked": lua_count, "javascript_blocks_checked": javascript_count, "update_routes_checked": True, "overview_javascript_checked": True, "ip_parser_tests_passed": True, "awg_tests_passed": True}
 (ROOT / "build/localization-report.json").write_text(json.dumps(report, indent=2) + "\n")
 print(json.dumps(report))
