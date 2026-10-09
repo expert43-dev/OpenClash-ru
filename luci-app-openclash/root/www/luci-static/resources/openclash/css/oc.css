@@ -7415,3 +7415,7 @@ html[data-darkmode=true] .oc #addCustomOption:hover {
     #debug-rendered .pre-copy-btn { width: 36px; height: 36px; }
     #debug-rendered .pre-copy-btn svg { width: 18px; height: 18px; }
 }
+
+/* Russian service cards */
+.oc .myip-card-icon.ic-yandex { color: #fc3f1d; }
+.oc .myip-card-icon.ic-vk { color: #0077ff; }

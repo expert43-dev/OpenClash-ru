@@ -6,17 +6,17 @@
     local fs = require "luci.openclash"
     local plugin_version = fs.oc_version()
 %>
-<link rel="dns-prefetch" href="//whois.pconline.com.cn">
+<link rel="dns-prefetch" href="//api.ipgeo.ru">
 <link rel="dns-prefetch" href="//api.ip.sb">
 <link rel="dns-prefetch" href="//api.ipify.org">
-<link rel="dns-prefetch" href="//myip.ipip.net">
-<link rel="preconnect" href="https://whois.pconline.com.cn">
+<link rel="dns-prefetch" href="//ip.mail.ru">
+<link rel="preconnect" href="https://api.ipgeo.ru">
 <link rel="preconnect" href="https://api.ip.sb">
 <link rel="preconnect" href="https://api.ipify.org">
-<link rel="preconnect" href="http://myip.ipip.net">
+<link rel="preconnect" href="https://ip.mail.ru">
 <meta name="referrer" content="no-referrer">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,minimal-ui">
-<title>IP 地址查询</title>
+<title><%:IP Address%></title>
 <script src="/luci-static/resources/openclash/js/oc-icons.js?v=<%=plugin_version%>"></script>
 </head>
 
@@ -41,15 +41,15 @@
 
                                 <div class="myip-ip-list">
                                     <div class="myip-card-item myip-ip-item">
-                                        <span class="myip-card-label">PConline</span>
-                                        <span class="myip-ip-addr" id="ip-pcol"></span>
-                                        <span class="myip-ip-geo" id="ip-pcol-geo"></span>
+                                        <span class="myip-card-label">IPgeo.ru</span>
+                                        <span class="myip-ip-addr" id="ip-ipgeo"></span>
+                                        <span class="myip-ip-geo" id="ip-ipgeo-geo"></span>
                                     </div>
 
                                     <div class="myip-card-item myip-ip-item">
-                                        <span class="myip-card-label">IPIP.NET</span>
-                                        <span class="myip-ip-addr" id="ip-ipip"></span>
-                                        <span class="myip-ip-geo" id="ip-ipip-geo"></span>
+                                        <span class="myip-card-label">Mail.ru</span>
+                                        <span class="myip-ip-addr" id="ip-mailru"></span>
+                                        <span class="myip-ip-geo" id="ip-mailru-geo"></span>
                                     </div>
 
                                     <div class="myip-card-item myip-ip-item">
@@ -86,31 +86,31 @@
                                 </p>
 
                                 <div class="myip-check-list">
-                                    <div class="myip-card-item myip-check-item" data-svc="baidu">
-                                        <span class="myip-card-label"><svg class="myip-card-icon ic-baidu"><use href="#oc-icon-brand-baidu"/></svg><span><%:Baidu Search%></span></span>
+                                    <div class="myip-card-item myip-check-item" data-svc="yandex">
+                                        <span class="myip-card-label"><svg class="myip-card-icon ic-yandex"><use href="#oc-icon-globe"/></svg><span><%:Yandex%></span></span>
                                         <div class="myip-check-row">
-                                            <span class="myip-latency" id="latency-baidu">--</span>
-                                            <span class="myip-latency-unit">ms</span>
-                                            <div class="myip-status-dot testing" id="dot-baidu" title="<%:Testing...%>"></div>
+                                            <span class="myip-latency" id="latency-yandex">--</span>
+                                            <span class="myip-latency-unit"><%:Milliseconds%></span>
+                                            <div class="myip-status-dot testing" id="dot-yandex" title="<%:Testing...%>"></div>
                                         </div>
-                                        <div class="myip-sparkline-wrap" id="spark-baidu"></div>
+                                        <div class="myip-sparkline-wrap" id="spark-yandex"></div>
                                     </div>
 
-                                    <div class="myip-card-item myip-check-item" data-svc="163">
-                                        <span class="myip-card-label"><svg class="myip-card-icon ic-netease"><use href="#oc-icon-brand-netease"/></svg><span><%:NetEase Music%></span></span>
+                                    <div class="myip-card-item myip-check-item" data-svc="vk">
+                                        <span class="myip-card-label"><svg class="myip-card-icon ic-vk"><use href="#oc-icon-globe"/></svg><span><%:VK%></span></span>
                                         <div class="myip-check-row">
-                                            <span class="myip-latency" id="latency-163">--</span>
-                                            <span class="myip-latency-unit">ms</span>
-                                            <div class="myip-status-dot testing" id="dot-163" title="<%:Testing...%>"></div>
+                                            <span class="myip-latency" id="latency-vk">--</span>
+                                            <span class="myip-latency-unit"><%:Milliseconds%></span>
+                                            <div class="myip-status-dot testing" id="dot-vk" title="<%:Testing...%>"></div>
                                         </div>
-                                        <div class="myip-sparkline-wrap" id="spark-163"></div>
+                                        <div class="myip-sparkline-wrap" id="spark-vk"></div>
                                     </div>
 
                                     <div class="myip-card-item myip-check-item" data-svc="github">
                                         <span class="myip-card-label"><svg class="myip-card-icon ic-github"><use href="#oc-icon-brand-github"/></svg><span>GitHub</span></span>
                                         <div class="myip-check-row">
                                             <span class="myip-latency" id="latency-github">--</span>
-                                            <span class="myip-latency-unit">ms</span>
+                                            <span class="myip-latency-unit"><%:Milliseconds%></span>
                                             <div class="myip-status-dot testing" id="dot-github" title="<%:Testing...%>"></div>
                                         </div>
                                         <div class="myip-sparkline-wrap" id="spark-github"></div>
@@ -120,7 +120,7 @@
                                         <span class="myip-card-label"><svg class="myip-card-icon ic-youtube"><use href="#oc-icon-brand-youtube"/></svg><span>YouTube</span></span>
                                         <div class="myip-check-row">
                                             <span class="myip-latency" id="latency-youtube">--</span>
-                                            <span class="myip-latency-unit">ms</span>
+                                            <span class="myip-latency-unit"><%:Milliseconds%></span>
                                             <div class="myip-status-dot testing" id="dot-youtube" title="<%:Testing...%>"></div>
                                         </div>
                                         <div class="myip-sparkline-wrap" id="spark-youtube"></div>
@@ -129,7 +129,7 @@
                             </div>
 
                             <div class="myip-footer">
-                                <p>Powered by <a onclick="return ip_skk()" href="javascript:void(0);">ip.skk.moe</a></p>
+                                <p><%:Based on%> <a onclick="return ip_skk()" href="javascript:void(0);">ip.skk.moe</a></p>
                             </div>
                         </div>
                     </div>
@@ -158,16 +158,16 @@
         window.open(url2);
     }
     const $$ = document;
-    var ip_ipip_ip;
+    var ip_mailru_ip;
     var ip_ipsb_ip;
-    var ip_pcol_ip;
+    var ip_ipgeo_ip;
     var ip_ipify_ip;
 
     var INTERVAL = {
         HTTP_CHECK_MIN: 20 * 1000,   // accessibility check
         HTTP_CHECK_MAX: 50 * 1000,
-        IP_CHECK_MIN: 50 * 1000,     // IP info
-        IP_CHECK_MAX: 80 * 1000
+        IP_CHECK_MIN: 180 * 1000,     // IP info
+        IP_CHECK_MAX: 300 * 1000
     };
 
     function startHttpInterval() {
@@ -193,15 +193,15 @@
     var refresh_ip;
     var ipCheckXHR = null;
     var httpCheckXHR = null;
-    $$.getElementById('ip-ipip').innerHTML = '<%:Querying...%>';
+    $$.getElementById('ip-mailru').innerHTML = '<%:Querying...%>';
     $$.getElementById('ip-ipify').innerHTML = '<%:Querying...%>';
-    $$.getElementById('ip-pcol').innerHTML = '<%:Querying...%>';
+    $$.getElementById('ip-ipgeo').innerHTML = '<%:Querying...%>';
     $$.getElementById('ip-ipsb').innerHTML = '<%:Querying...%>';
 
     var SpeedHistory = {
         max: 10,
-        data: { baidu:[], 163:[], github:[], youtube:[] },
-        _prevPath: { baidu: null, 163: null, github: null, youtube: null },
+        data: { yandex:[], vk:[], github:[], youtube:[] },
+        _prevPath: { yandex: null, vk: null, github: null, youtube: null },
         push: function(svc, ms) {
             this.data[svc].push(ms);
             if (this.data[svc].length > this.max) this.data[svc].shift();
@@ -340,7 +340,7 @@
                     ep.y = parseFloat(nearest.y);
                     var epScreen = ep.matrixTransform(ctm);
                     var px = epScreen.x - elRect.left;
-                    tip.textContent = nearest.v + ' ms';
+                    tip.textContent = nearest.v + ' <%:Milliseconds%>';
                     tip.style.color = latencyColor(getLatencyClass(nearest.v));
                     tip.style.display = 'block';
                     var tw = tip.offsetWidth;
@@ -442,12 +442,12 @@
                     }
                     return json;
                 } else {
-                    throw new Error(JSON.stringify(json.error));
+                    throw new Error('HTTP ' + status);
                 }
             }).catch(error => {
                 throw error;
             }),
-        parseIPIpip: (ip, elID) => {
+        lookupGeo: (ip, elID) => {
             const v4 = '(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]\\d|\\d)(?:\\.(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]\\d|\\d)){3}';
             const v4Exact = new RegExp(`^${v4}$`);
             const anonymizedIp = (() => {
@@ -460,67 +460,38 @@
 
             fetch(`https://api.ip.sb/geoip/${anonymizedIp}`, {
             referrerPolicy: 'no-referrer-when-downgrade',
-            }).then(r => r.json())
-            .then(resp => {
-                if ( resp.country && resp.country != '' && resp.isp && resp.isp != '' ) {
-                    $$.getElementById(elID).innerHTML = resp.country + ' ' + resp.isp;
-                }
-                else {
-                    fetch(`https://qqwry.api.skk.moe/${anonymizedIp}`, {
-                    referrerPolicy: 'no-referrer-when-downgrade',
-                    }).then(r => r.json())
-                    .then(resp => {
-                        if ( resp.geo.indexOf('skk.moe') == -1 ) {
-                            $$.getElementById(elID).innerHTML = resp.geo;
-                        }
-                        else {
-                            $$.getElementById(elID).innerHTML = 'Unknown';
-                        }
-                    })
-                }
-            })
-        },
-        getPcolIP: () => {
-            document.querySelectorAll('script[data-pcol]').forEach(function(el) {
-                el.parentNode.removeChild(el);
+            }).catch(() => {
+                $$.getElementById(elID).textContent = '<%:Unknown%>';
             });
-            window.IPCallBack = null;
-
-            var script = document.createElement('script');
-            script.setAttribute('data-pcol', '');
-            script.src = 'https://whois.pconline.com.cn/ipJson.jsp?z=' + random;
-            window.IPCallBack = function(data) {
-                if (data && data.ip) {
-                    if (localStorage.getItem('privacy_my_ip') != 'true') {
-                        $$.getElementById('ip-pcol').innerHTML = data.ip;
-                    }
-                    var geo = [];
-                    if (data.pro) geo.push(data.pro);
-                    if (data.city) geo.push(data.city);
-                    if (data.addr) {
-                        var ispMatch = data.addr.match(/\s(\S+)$/);
-                        if (ispMatch) geo.push(ispMatch[1]);
-                    }
-                    $$.getElementById('ip-pcol-geo').innerHTML = geo.join(' ');
-                }
+        },
+        getIpgeoIP: () => {
+            IP.get('https://api.ipgeo.ru/', 'json').then(resp => {
+                if (!resp.data.ok) throw new Error('Invalid IPgeo response');
+                update_ip_single({service: 'ipgeo', ip: resp.data.ip, country_code: resp.data.country});
+                addTitleOnOverflow();
+            }).catch(() => update_ip_single({service: 'ipgeo', error: 'timeout'}));
+        },
+        getMailruIP: () => {
+            // Mail.ru exposes a JSONP endpoint for browser requests without CORS.
+            const script = document.createElement('script');
+            const callback = 'ocMailIP' + Date.now();
+            const cleanup = () => { script.remove(); delete window[callback]; };
+            const timer = setTimeout(() => {
+                cleanup();
+                update_ip_single({service: 'mailru', error: 'timeout'});
+            }, 10000);
+            window[callback] = data => {
+                clearTimeout(timer); cleanup();
+                if (data && data.ipAddress) update_ip_single({service: 'mailru', ip: data.ipAddress});
+                else update_ip_single({service: 'mailru', error: 'invalid_response'});
                 addTitleOnOverflow();
             };
+            script.onerror = () => {
+                clearTimeout(timer); cleanup();
+                update_ip_single({service: 'mailru', error: 'timeout'});
+            };
+            script.src = 'https://ip.mail.ru/ip.html?callback=' + callback;
             document.head.appendChild(script);
-        },
-        getIpipIP: () => {
-            IP.get(`http://myip.ipip.net?z=${random}`, 'text')
-            .then(resp => {
-                const ipMatch = resp.data.match(/当前 IP：([0-9A-Fa-f:.]+)/);
-                const geoMatch = resp.data.match(/来自于：(.+)/);
-
-                if (ipMatch && geoMatch) {
-                    if (localStorage.getItem('privacy_my_ip') != 'true') {
-                        $$.getElementById('ip-ipip').innerHTML = ipMatch[1];
-                    }
-                    $$.getElementById('ip-ipip-geo').innerHTML = geoMatch[1].trim();
-                    addTitleOnOverflow();
-                }
-            })
         },
         getIpifyIP: () => {
             IP.get(`https://api.ipify.org/?format=json&z=${random}`, 'json')
@@ -531,7 +502,7 @@
                 return resp.data.ip;
             })
             .then(ip => {
-                IP.parseIPIpip(ip, 'ip-ipify-geo');
+                IP.lookupGeo(ip, 'ip-ipify-geo');
                 addTitleOnOverflow();
             })
         },
@@ -542,7 +513,7 @@
                     if (localStorage.getItem('privacy_my_ip') != 'true') {
                         $$.getElementById('ip-ipsb').innerHTML = data.ip;
                     };
-                    $$.getElementById('ip-ipsb-geo').innerHTML = `${data.country} ${data.isp}`;
+                    $$.getElementById('ip-ipsb-geo').textContent = `${countryName(data.country_code) || data.country} ${data.isp}`;
                     addTitleOnOverflow();
                 })
         }
@@ -573,16 +544,16 @@
         },
         runcheck: function() {
             if (!use_router_mode) {
-                HTTP.checker_browser('baidu', 'www.baidu.com');
-                HTTP.checker_browser('163', 's1.music.126.net/style');
+                HTTP.checker_browser('yandex', 'ya.ru');
+                HTTP.checker_browser('vk', 'vk.ru');
                 HTTP.checker_browser('github', 'github.com');
                 HTTP.checker_browser('youtube', 'www.youtube.com');
                 return;
             }
 
             var svcDomains = [
-                { svc: 'baidu', domain: 'www.baidu.com' },
-                { svc: '163', domain: 's1.music.126.net/style' },
+                { svc: 'yandex', domain: 'ya.ru' },
+                { svc: 'vk', domain: 'vk.ru' },
                 { svc: 'github', domain: 'github.com' },
                 { svc: 'youtube', domain: 'www.youtube.com' }
             ];
@@ -633,8 +604,8 @@
 
     function myip_Load()
     {
-        IP.getPcolIP();
-        IP.getIpipIP();
+        IP.getIpgeoIP();
+        IP.getMailruIP();
         IP.getIpifyIP();
         IP.getIpsbIP();
     };
@@ -664,23 +635,23 @@
             localStorage.setItem('privacy_my_ip', 'true');
             update_eye_icon(false);
 
-            ip_ipip_ip = $$.getElementById('ip-ipip').innerHTML;
+            ip_mailru_ip = $$.getElementById('ip-mailru').innerHTML;
             ip_ipsb_ip = $$.getElementById('ip-ipsb').innerHTML;
-            ip_pcol_ip = $$.getElementById('ip-pcol').innerHTML;
+            ip_ipgeo_ip = $$.getElementById('ip-ipgeo').innerHTML;
             ip_ipify_ip = $$.getElementById('ip-ipify').innerHTML;
-            $$.getElementById('ip-ipip').innerHTML = '***.***.***.***';
+            $$.getElementById('ip-mailru').innerHTML = '***.***.***.***';
             $$.getElementById('ip-ipsb').innerHTML = '***.***.***.***';
-            $$.getElementById('ip-pcol').innerHTML = '***.***.***.***';
+            $$.getElementById('ip-ipgeo').innerHTML = '***.***.***.***';
             $$.getElementById('ip-ipify').innerHTML = '***.***.***.***';
             addTitleOnOverflow();
         } else {
             update_eye_icon(true);
             localStorage.removeItem('privacy_my_ip');
 
-            if (ip_ipip_ip && ip_ipsb_ip && ip_pcol_ip && ip_ipify_ip) {
-                $$.getElementById('ip-ipip').innerHTML = ip_ipip_ip;
+            if (ip_mailru_ip && ip_ipsb_ip && ip_ipgeo_ip && ip_ipify_ip) {
+                $$.getElementById('ip-mailru').innerHTML = ip_mailru_ip;
                 $$.getElementById('ip-ipsb').innerHTML = ip_ipsb_ip;
-                $$.getElementById('ip-pcol').innerHTML = ip_pcol_ip;
+                $$.getElementById('ip-ipgeo').innerHTML = ip_ipgeo_ip;
                 $$.getElementById('ip-ipify').innerHTML = ip_ipify_ip;
             } else {
                 if (use_router_mode) {
@@ -741,7 +712,7 @@
     }
 
     function showAllGhosts() {
-        ['baidu','163','github','youtube'].forEach(function(svc) {
+        ['yandex','vk','github','youtube'].forEach(function(svc) {
             SpeedHistory.renderSparkline(svc, document.getElementById('spark-' + svc));
         });
     }
@@ -750,9 +721,9 @@
         if (refresh_ip) { clearInterval(refresh_ip); refresh_ip = null; }
 
         if (localStorage.getItem('privacy_my_ip') === 'true') {
-            $$.getElementById('ip-ipip').innerHTML = '***.***.***.***';
+            $$.getElementById('ip-mailru').innerHTML = '***.***.***.***';
             $$.getElementById('ip-ipsb').innerHTML = '***.***.***.***';
-            $$.getElementById('ip-pcol').innerHTML = '***.***.***.***';
+            $$.getElementById('ip-ipgeo').innerHTML = '***.***.***.***';
             $$.getElementById('ip-ipify').innerHTML = '***.***.***.***';
         }
 
@@ -766,13 +737,13 @@
 
     function init_browser_mode() {
         if (localStorage.getItem('privacy_my_ip') === 'true') {
-            $$.getElementById('ip-ipip').innerHTML = '***.***.***.***';
+            $$.getElementById('ip-mailru').innerHTML = '***.***.***.***';
             $$.getElementById('ip-ipsb').innerHTML = '***.***.***.***';
-            $$.getElementById('ip-pcol').innerHTML = '***.***.***.***';
+            $$.getElementById('ip-ipgeo').innerHTML = '***.***.***.***';
             $$.getElementById('ip-ipify').innerHTML = '***.***.***.***';
-            $$.getElementById('ip-ipip-geo').innerHTML = '';
+            $$.getElementById('ip-mailru-geo').innerHTML = '';
             $$.getElementById('ip-ipsb-geo').innerHTML = '';
-            $$.getElementById('ip-pcol-geo').innerHTML = '';
+            $$.getElementById('ip-ipgeo-geo').innerHTML = '';
             $$.getElementById('ip-ipify-geo').innerHTML = '';
         } else {
             reset_display();
@@ -834,14 +805,20 @@
         ipCheckXHR = xhr;
     }
 
+    function countryName(code) {
+        if (!code) return '';
+        try { return new Intl.DisplayNames(['ru'], {type: 'region'}).of(code.toUpperCase()); }
+        catch (e) { return code; }
+    }
+
     function update_ip_single(obj) {
         if (!obj || !obj.service) return;
         var key = obj.service;
         var isPrivacy = localStorage.getItem('privacy_my_ip') === 'true';
 
         var fieldMap = {
-            'pcol': { id: 'ip-pcol', geo: 'ip-pcol-geo' },
-            'ipip': { id: 'ip-ipip', geo: 'ip-ipip-geo' },
+            'ipgeo': { id: 'ip-ipgeo', geo: 'ip-ipgeo-geo' },
+            'mailru': { id: 'ip-mailru', geo: 'ip-mailru-geo' },
             'ipsb': { id: 'ip-ipsb', geo: 'ip-ipsb-geo' },
             'ipify': { id: 'ip-ipify', geo: 'ip-ipify-geo' }
         };
@@ -859,27 +836,16 @@
         }
 
         if (obj.ip) {
-            $$.getElementById(el.id).innerHTML = isPrivacy ? '***.***.***.***' : obj.ip;
+            $$.getElementById(el.id).textContent = isPrivacy ? '***.***.***.***' : obj.ip;
         }
-        if (obj.geo) {
-            var geoText = obj.geo;
-            if (obj.raw) {
-                try {
-                    // decode percent-encoded GBK bytes without UTF-8 validation
-                    // (decodeURIComponent rejects non-UTF-8 bytes like %b9)
-                    var latin1 = geoText.replace(/%([0-9A-Fa-f]{2})/g, function(_, h) {
-                        return String.fromCharCode(parseInt(h, 16));
-                    });
-                    var rawBytes = Uint8Array.from(latin1, function(c) { return c.charCodeAt(0); });
-                    geoText = new TextDecoder('gbk').decode(rawBytes);
-                } catch(e) { geoText = ''; }
-            }
-            $$.getElementById(el.geo).innerHTML = geoText;
+        if (obj.country_code || obj.geo) {
+            var geoText = [countryName(obj.country_code), obj.geo || ''].filter(Boolean).join(' ');
+            $$.getElementById(el.geo).textContent = geoText;
         }
     }
 
     function has_ip_cache() {
-        const ip_ids = ['ip-ipip', 'ip-ipsb', 'ip-pcol', 'ip-ipify'];
+        const ip_ids = ['ip-mailru', 'ip-ipsb', 'ip-ipgeo', 'ip-ipify'];
         for (let id of ip_ids) {
             let val = document.getElementById(id).innerHTML;
             if (
@@ -895,31 +861,31 @@
 
     function show_querying_state() {
         if (localStorage.getItem('privacy_my_ip') === 'true') {
-            $$.getElementById('ip-ipip').innerHTML = '***.***.***.***';
+            $$.getElementById('ip-mailru').innerHTML = '***.***.***.***';
             $$.getElementById('ip-ipsb').innerHTML = '***.***.***.***';
-            $$.getElementById('ip-pcol').innerHTML = '***.***.***.***';
+            $$.getElementById('ip-ipgeo').innerHTML = '***.***.***.***';
             $$.getElementById('ip-ipify').innerHTML = '***.***.***.***';
         } else {
-            $$.getElementById('ip-ipip').innerHTML = '<%:Querying...%>';
+            $$.getElementById('ip-mailru').innerHTML = '<%:Querying...%>';
             $$.getElementById('ip-ipsb').innerHTML = '<%:Querying...%>';
-            $$.getElementById('ip-pcol').innerHTML = '<%:Querying...%>';
+            $$.getElementById('ip-ipgeo').innerHTML = '<%:Querying...%>';
             $$.getElementById('ip-ipify').innerHTML = '<%:Querying...%>';
         }
-        $$.getElementById('ip-ipip-geo').innerHTML = '';
+        $$.getElementById('ip-mailru-geo').innerHTML = '';
         $$.getElementById('ip-ipsb-geo').innerHTML = '';
-        $$.getElementById('ip-pcol-geo').innerHTML = '';
+        $$.getElementById('ip-ipgeo-geo').innerHTML = '';
         $$.getElementById('ip-ipify-geo').innerHTML = '';
     }
 
     function reset_display() {
-        $$.getElementById('ip-ipip').innerHTML = '<%:Querying...%>';
+        $$.getElementById('ip-mailru').innerHTML = '<%:Querying...%>';
         $$.getElementById('ip-ipify').innerHTML = '<%:Querying...%>';
-        $$.getElementById('ip-pcol').innerHTML = '<%:Querying...%>';
+        $$.getElementById('ip-ipgeo').innerHTML = '<%:Querying...%>';
         $$.getElementById('ip-ipsb').innerHTML = '<%:Querying...%>';
 
-        $$.getElementById('ip-ipip-geo').innerHTML = '';
+        $$.getElementById('ip-mailru-geo').innerHTML = '';
         $$.getElementById('ip-ipify-geo').innerHTML = '';
-        $$.getElementById('ip-pcol-geo').innerHTML = '';
+        $$.getElementById('ip-ipgeo-geo').innerHTML = '';
         $$.getElementById('ip-ipsb-geo').innerHTML = '';
     }
 
@@ -930,13 +896,13 @@
             get_router_ip_info();
         } else {
             if (localStorage.getItem('privacy_my_ip') === 'true') {
-                $$.getElementById('ip-ipip-geo').innerHTML = '';
+                $$.getElementById('ip-mailru-geo').innerHTML = '';
                 $$.getElementById('ip-ipsb-geo').innerHTML = '';
-                $$.getElementById('ip-pcol-geo').innerHTML = '';
+                $$.getElementById('ip-ipgeo-geo').innerHTML = '';
                 $$.getElementById('ip-ipify-geo').innerHTML = '';
-                $$.getElementById('ip-ipip').innerHTML = '***.***.***.***';
+                $$.getElementById('ip-mailru').innerHTML = '***.***.***.***';
                 $$.getElementById('ip-ipsb').innerHTML = '***.***.***.***';
-                $$.getElementById('ip-pcol').innerHTML = '***.***.***.***';
+                $$.getElementById('ip-ipgeo').innerHTML = '***.***.***.***';
                 $$.getElementById('ip-ipify').innerHTML = '***.***.***.***';
             }
             myip_Load();

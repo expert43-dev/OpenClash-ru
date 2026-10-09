@@ -1,0 +1,8 @@
+#!/bin/sh
+# Select the installed Russian catalog. This does not alter VPN settings.
+uci -q set luci.languages.ru='Русский'
+uci -q set luci.main.lang='ru'
+uci -q commit luci
+rm -f /tmp/openclash_version_history.json /tmp/openclash_cdn_info.json
+rm -f /tmp/openclash_version_history_*.json /tmp/openclash_cdn_info_*.json
+exit 0

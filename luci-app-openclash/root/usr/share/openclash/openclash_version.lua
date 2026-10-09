@@ -82,8 +82,12 @@ local function cdn_list()
 	return DEFAULT_CDN_LIST
 end
 
+local function repository_for(path)
+    return path:match("/version$") and "expert43-dev/OpenClash-ru" or "vernesong/OpenClash"
+end
+
 local function raw_url(path)
-	return "https://raw.githubusercontent.com/vernesong/OpenClash/" .. path
+    return "https://raw.githubusercontent.com/" .. repository_for(path) .. "/" .. path
 end
 
 local function build_fetch_urls(mod, path)
@@ -95,7 +99,7 @@ local function build_fetch_urls(mod, path)
 		return urls
 	end
 	if mod == "https://cdn.jsdelivr.net/" or mod == "https://fastly.jsdelivr.net/" or mod == "https://testingcf.jsdelivr.net/" then
-		return { mod .. "gh/vernesong/OpenClash@" .. path }
+		return { mod .. "gh/" .. repository_for(path) .. "@" .. path }
 	end
 	return { mod .. raw_url(path) }
 end
@@ -421,7 +425,7 @@ local function html_unescape(s)
 end
 
 local function build_feed_urls(mod, path)
-	local feed = "https://github.com/vernesong/OpenClash/commits/" .. path .. ".atom"
+	local feed = "https://github.com/" .. repository_for(path) .. "/commits/" .. path .. ".atom"
 	if mod == "0" or mod == "" then
 		local urls = { feed }
 		for _, cdn in ipairs(cdn_list()) do

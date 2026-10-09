@@ -61,3 +61,10 @@ build/
 # Patch files (unless intentional)
 *.orig
 *.rej
+
+# Russian fork build artifacts
+/build/
+/dist/
+/tools/translation-cache.json
+__pycache__/
+*.pyc

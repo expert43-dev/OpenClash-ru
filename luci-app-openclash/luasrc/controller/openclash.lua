@@ -2331,59 +2331,17 @@ function action_myip_check()
 	local random = math.random(100000000)
 	HTTP.prepare_content("text/plain; charset=utf-8")
 
+	local ru_ip = require "luci.openclash_ru_ip"
 	local services = {
 		{
-			name = "pcol",
-			url = string.format("https://whois.pconline.com.cn/ipJson.jsp?json=true&z=%d", random),
-			parser = function(data)
-				if data and data ~= "" then
-					-- json.parse tolerates GBK bytes in string values (JSON structure is ASCII)
-					local ok, parsed = pcall(json.parse, data)
-					if ok and parsed and parsed.ip then
-						local geo_parts = {}
-						if parsed.pro and parsed.pro ~= "" then
-							table.insert(geo_parts, parsed.pro)
-						end
-						if parsed.city and parsed.city ~= "" then
-							table.insert(geo_parts, parsed.city)
-						end
-						if parsed.addr and parsed.addr ~= "" then
-							local isp = string.match(parsed.addr, "%s(%S+)$")
-							if isp then
-								table.insert(geo_parts, isp)
-							end
-						end
-						local geo = table.concat(geo_parts, " ")
-						return {
-							ip = parsed.ip,
-							geo = HTTP.urlencode(geo),
-							raw = true
-						}
-					end
-				end
-				return nil
-			end
+			name = "ipgeo",
+			url = "https://api.ipgeo.ru/",
+			parser = function(data) return ru_ip.ipgeo(data, json.parse) end
 		},
 		{
-			name = "ipip",
-			url = string.format("http://myip.ipip.net?z=%d", random),
-			parser = function(data)
-				if data and data ~= "" then
-					local ip = string.match(data, "当前 IP：([%x:%.]+)")
-					local geo = string.match(data, "来自于：(.+)")
-
-					if ip and geo then
-						geo = string.gsub(geo, "%s+", " ")
-						geo = string.gsub(geo, "^%s*(.-)%s*$", "%1")
-
-						return {
-							ip = ip,
-							geo = geo
-						}
-					end
-				end
-				return nil
-			end
+			name = "mailru",
+			url = "https://ip.mail.ru/ip.html",
+			parser = ru_ip.mail
 		},
 		{
 			name = "ipsb",
@@ -2393,7 +2351,7 @@ function action_myip_check()
 					local ok, ipsb_json = pcall(json.parse, data)
 					if ok and ipsb_json and ipsb_json.ip then
 						local geo_parts = {}
-						if ipsb_json.country and ipsb_json.country ~= "" then
+						if not ipsb_json.country_code and ipsb_json.country and ipsb_json.country ~= "" then
 							table.insert(geo_parts, ipsb_json.country)
 						end
 						if ipsb_json.isp and ipsb_json.isp ~= "" then
@@ -2402,7 +2360,8 @@ function action_myip_check()
 
 						return {
 							ip = ipsb_json.ip,
-							geo = table.concat(geo_parts, " ")
+							geo = table.concat(geo_parts, " "),
+							country_code = ipsb_json.country_code
 						}
 					end
 				end
@@ -2435,7 +2394,7 @@ function action_myip_check()
 
 		local ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 		local cmd = string.format(
-			'curl -SsL -m 10 -A "%s" "%s" 2>/dev/null',
+			'curl -4 -SsL -m 10 -A "%s" "%s" 2>/dev/null',
 			ua, service.url
 		)
 
@@ -2529,6 +2488,7 @@ function action_myip_check()
 							service = name,
 							ip = parsed_result.ip,
 							geo = parsed_result.geo,
+							country_code = parsed_result.country_code,
 							raw = parsed_result.raw
 						})
 						if ok_j and jdata then write_padded(jdata) end
@@ -2559,6 +2519,7 @@ function action_myip_check()
 								service = name,
 								ip = parsed_result.ip,
 								geo = parsed_result.geo,
+								country_code = parsed_result.country_code,
 								raw = parsed_result.raw
 							})
 							if ok_j and jdata then write_padded(jdata) end
@@ -2634,7 +2595,7 @@ function action_myip_check()
 			local ok_geo, geo_json = pcall(json.parse, geo_data)
 			if ok_geo and geo_json and geo_json.ip then
 				local geo_parts = {}
-				if geo_json.country and geo_json.country ~= "" then
+				if not geo_json.country_code and geo_json.country and geo_json.country ~= "" then
 					table.insert(geo_parts, geo_json.country)
 				end
 				if geo_json.isp and geo_json.isp ~= "" then
@@ -2642,7 +2603,7 @@ function action_myip_check()
 				end
 				local geo = table.concat(geo_parts, " ")
 				result.ipify.geo = geo
-				write_padded(json.stringify({ service = "ipify", geo = geo }))
+				write_padded(json.stringify({ service = "ipify", geo = geo, country_code = geo_json.country_code }))
 			end
 		end
 	end
@@ -3227,6 +3188,7 @@ function action_cdn_info()
 			return oix_version
 		end
 
+		local repository = file_type == "plugin" and "expert43-dev/OpenClash-ru" or "vernesong/OpenClash"
 		local file = file_type == "plugin" and branch .. "/version" or branch .. "/core_version"
 		local ref
 		if file_type == "plugin" then
@@ -3237,11 +3199,11 @@ function action_cdn_info()
 		local ctype = classify_cdn(cdn)
 
 		if ctype == "raw" then
-			return "https://raw.githubusercontent.com/vernesong/OpenClash/" .. ref .. "/" .. file
+			return "https://raw.githubusercontent.com/" .. repository .. "/" .. ref .. "/" .. file
 		elseif ctype == "jsdelivr" then
-			return cdn .. "gh/vernesong/OpenClash@" .. ref .. "/" .. file
+			return cdn .. "gh/" .. repository .. "@" .. ref .. "/" .. file
 		else
-			return cdn .. "https://raw.githubusercontent.com/vernesong/OpenClash/" .. ref .. "/" .. file
+			return cdn .. "https://raw.githubusercontent.com/" .. repository .. "/" .. ref .. "/" .. file
 		end
 	end
 

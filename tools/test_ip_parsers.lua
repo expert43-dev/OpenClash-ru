@@ -1,0 +1,17 @@
+local parser = dofile("luci-app-openclash/luasrc/openclash_ru_ip.lua")
+assert(parser.valid_ipv4("0.0.0.0"))
+assert(parser.valid_ipv4("255.255.255.255"))
+for _, value in ipairs({"256.1.1.1", "1.2.3", "1.2.3.4.5", "1.2.3.4;reboot", "<script>", "::1", ""}) do
+    assert(not parser.valid_ipv4(value), value)
+end
+local ip = parser.ipgeo("response", function() return {ok=true, ip="1.2.3.4", country="RU"} end)
+assert(ip.ip == "1.2.3.4" and ip.country_code == "RU")
+assert(not parser.ipgeo("response", function() return {ok=false, ip="1.2.3.4"} end))
+assert(not parser.ipgeo("response", function() error("invalid JSON") end))
+assert(not parser.ipgeo("response", function() return {ok=true, ip="256.1.1.1"} end))
+assert(parser.mail('(none)({"ipAddress":"1.2.3.4","xForwardedFor":"(none)"})').ip == "1.2.3.4")
+assert(parser.mail('ocMailIP123({"ipAddress": "1.2.3.4"})').ip == "1.2.3.4")
+assert(not parser.mail('{"ipAddress":"256.2.3.4"}'))
+assert(not parser.mail('{"ipAddress":"1.2.3.4;reboot"}'))
+assert(not parser.mail(''))
+print("IPgeo/Mail parsers: positive, error and malformed responses passed")

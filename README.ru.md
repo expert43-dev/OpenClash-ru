@@ -59,5 +59,3 @@ apk add --allow-untrusted /tmp/luci-app-openclash-0.47.156.1.apk
 официального репозитория OpenWrt; сверьте его с опубликованным `SHA256SUMS`.
 Для отката установите сохранённый официальный APK v0.47.156 и восстановите
 предыдущий язык LuCI. IPK для старых версий OpenWrt пока не публикуется.
-
-Оригинальная документация: [README.upstream.md](README.upstream.md).
